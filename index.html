@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta de Proyecto: Controlador de Carga PID Solar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cool Neutrals -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA (Single Page Application) con navegación superior fija que permite el desplazamiento suave a las secciones clave del informe: Justificación, Objetivos, Diseño del Sistema, Metodología y Cronograma. Esta estructura vertical y navegable es superior al documento estático porque permite al usuario (ej. un profesor) saltar directamente a la sección de interés. El flujo de usuario está diseñado para guiarlo lógicamente a través de la propuesta, comenzando con el "porqué" (Justificación), el "qué" (Objetivos), el "cómo" (Diseño y Metodología), y el "cuándo" (Cronograma). La interactividad se centra en el diagrama de bloques y el cronograma para transformar los elementos más densos en experiencias explorables y claras. -->
+    <!-- Visualization & Content Choices: 
+        - Justificación: Informe -> Objetivo: Informar -> Presentación: Tarjetas con íconos -> Interacción: Ninguna, solo visual -> Justificación: Separa visualmente los 3 pilares de la justificación, mejorando la legibilidad. -> Método: HTML/Tailwind.
+        - Diagrama de Bloques: Informe -> Objetivo: Organizar/Informar -> Presentación: Diagrama de flujo con HTML/CSS -> Interacción: Clic en cada bloque para mostrar descripción detallada en un modal. -> Justificación: Convierte una lista estática en una herramienta de aprendizaje interactiva, permitiendo al usuario explorar el sistema componente por componente. -> Método: HTML/Tailwind/JS.
+        - Metodología: Informe -> Objetivo: Organizar/Mostrar Proceso -> Presentación: Lista con formato de acordeón -> Interacción: Clic para expandir/colapsar las actividades de cada fase. -> Justificación: Mantiene la sección limpia y organizada, permitiendo al usuario enfocarse en una fase a la vez. -> Método: HTML/Tailwind/JS.
+        - Cronograma: Informe -> Objetivo: Mostrar Cambio/Tiempo -> Presentación: Gráfico de barras horizontales (Gantt) -> Interacción: Tooltips al pasar el ratón para ver detalles. -> Justificación: Visualiza el plan de trabajo de manera mucho más efectiva e intuitiva que una tabla de texto. -> Librería: Chart.js (Canvas).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-lg md:text-xl font-bold text-sky-300">Proyecto de Control PID</h1>
+                <div class="hidden md:flex space-x-6 items-center">
+                    <a href="#justificacion" class="hover:text-sky-300 transition-colors">Justificación</a>
+                    <a href="#objetivos" class="hover:text-sky-300 transition-colors">Objetivos</a>
+                    <a href="#sistema" class="hover:text-sky-300 transition-colors">Sistema</a>
+                    <a href="#metodologia" class="hover:text-sky-300 transition-colors">Metodología</a>
+                    <a href="#cronograma" class="hover:text-sky-300 transition-colors">Cronograma</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden mt-3">
+                <a href="#justificacion" class="block py-2 px-4 text-sm hover:bg-slate-700 rounded">Justificación</a>
+                <a href="#objetivos" class="block py-2 px-4 text-sm hover:bg-slate-700 rounded">Objetivos</a>
+                <a href="#sistema" class="block py-2 px-4 text-sm hover:bg-slate-700 rounded">Sistema</a>
+                <a href="#metodologia" class="block py-2 px-4 text-sm hover:bg-slate-700 rounded">Metodología</a>
+                <a href="#cronograma" class="block py-2 px-4 text-sm hover:bg-slate-700 rounded">Cronograma</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="introduccion" class="text-center mb-16">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-700 mb-4">Controlador de Carga PID para Baterías con Fuente Solar Variable y Monitoreo Móvil</h1>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600">
+                Una propuesta de proyecto para el curso de Sistemas de Control que integra control clásico, gestión de energía renovable y tecnología IoT para una solución robusta y moderna.
+            </p>
+        </section>
+
+        <section id="justificacion" class="mb-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Justificación del Proyecto</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                    <h3 class="font-bold text-xl mb-3 text-sky-800">🚀 Optimización del Rendimiento</h3>
+                    <p class="text-slate-600">Un control PID permite una regulación precisa de la carga, adaptándose a las variaciones de la fuente solar y al estado de la batería, asegurando una transferencia de energía mucho más eficiente que los métodos convencionales.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                    <h3 class="font-bold text-xl mb-3 text-sky-800">💡 Innovación y Relevancia</h3>
+                    <p class="text-slate-600">La integración de monitoreo vía app móvil responde a las tendencias del IoT, añadiendo valor y proporcionando una herramienta práctica para la supervisión, diagnóstico y mantenimiento preventivo del sistema.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                    <h3 class="font-bold text-xl mb-3 text-sky-800">🎓 Aplicación Práctica</h3>
+                    <p class="text-slate-600">Este proyecto permite aplicar la teoría de Sistemas de Control a un problema de ingeniería real, cubriendo el ciclo completo desde el modelado y diseño hasta la implementación y validación en hardware y software.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="objetivos" class="mb-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Objetivos</h2>
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="font-bold text-xl text-sky-800 mb-4 border-b pb-2">🎯 Objetivo General</h3>
+                <p class="text-slate-600 mb-6">Diseñar, construir y validar un prototipo funcional de un controlador de carga para baterías, basado en un algoritmo PID, que gestione eficientemente la energía de paneles solares y permita su monitoreo a través de una aplicación móvil.</p>
+                
+                <h3 class="font-bold text-xl text-sky-800 mb-4 border-b pb-2">📋 Objetivos Específicos</h3>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li>Modelar el comportamiento dinámico del sistema para determinar los parámetros de control.</li>
+                    <li>Implementar el algoritmo PID en un microcontrolador para regular la carga.</li>
+                    <li>Diseñar y ensamblar el circuito de potencia (convertidor DC/DC).</li>
+                    <li>Desarrollar una aplicación móvil para visualización de datos en tiempo real.</li>
+                    <li>Realizar pruebas experimentales para sintonizar el controlador y validar el rendimiento.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="sistema" class="mb-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Diseño del Sistema</h2>
+            <p class="text-center text-slate-500 mb-8">Haga clic en cada componente para ver su descripción detallada.</p>
+            <div class="max-w-5xl mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center text-sm">
+                    <div class="diagram-block" data-id="panel">☀️<br>Paneles Solares</div>
+                    <div class="arrow">→</div>
+                    <div class="diagram-block" data-id="sensores">🌡️<br>Sensores</div>
+                    <div class="arrow">→</div>
+                    <div class="flex flex-col items-center">
+                        <div class="diagram-block w-48" data-id="microcontrolador">🧠<br>Microcontrolador<br>(con Lógica PID)</div>
+                        <div class="arrow-vertical-down">↓</div>
+                        <div class="diagram-block" data-id="potencia">⚡<br>Etapa de Potencia</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="diagram-block" data-id="bateria">🔋<br>Batería</div>
+                    <div class="arrow-dashed-up">↑</div>
+                </div>
+                 <div class="flex justify-center mt-4 md:mt-0 md:ml-[-12rem]">
+                    <div class="arrow-dashed-side">. . . . . .</div>
+                    <div class="diagram-block" data-id="comunicacion">📡<br>Módulo Comms</div>
+                    <div class="arrow">→</div>
+                    <div class="diagram-block" data-id="app">📱<br>App Móvil</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="metodologia" class="mb-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Metodología de Trabajo</h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <div class="accordion-item bg-white rounded-lg shadow-lg">
+                    <button class="accordion-header w-full text-left p-4 font-bold text-lg text-sky-800 flex justify-between items-center">
+                        <span>Fase 1: Investigación y Planificación</span>
+                        <span class="accordion-icon">+</span>
+                    </button>
+                    <div class="accordion-content hidden p-4 border-t">
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>Revisión bibliográfica sobre controladores de carga, algoritmos PID y sistemas de monitoreo.</li>
+                            <li>Selección de componentes electrónicos.</li>
+                            <li>Definición de especificaciones técnicas.</li>
+                            <li>Elaboración del cronograma de trabajo.</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-white rounded-lg shadow-lg">
+                    <button class="accordion-header w-full text-left p-4 font-bold text-lg text-sky-800 flex justify-between items-center">
+                        <span>Fase 2: Diseño y Simulación</span>
+                        <span class="accordion-icon">+</span>
+                    </button>
+                    <div class="accordion-content hidden p-4 border-t">
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>Modelado matemático del sistema en software de simulación (e.g., MATLAB/Simulink).</li>
+                            <li>Diseño de los circuitos electrónicos y del PCB.</li>
+                            <li>Sintonización teórica de los parámetros del controlador PID.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-lg">
+                    <button class="accordion-header w-full text-left p-4 font-bold text-lg text-sky-800 flex justify-between items-center">
+                        <span>Fase 3: Desarrollo e Implementación</span>
+                        <span class="accordion-icon">+</span>
+                    </button>
+                    <div class="accordion-content hidden p-4 border-t">
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>Ensamblaje del prototipo de hardware.</li>
+                            <li>Programación del microcontrolador (lazo de control, sensores, comunicación).</li>
+                            <li>Desarrollo de la interfaz y lógica de la aplicación móvil.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-lg">
+                    <button class="accordion-header w-full text-left p-4 font-bold text-lg text-sky-800 flex justify-between items-center">
+                        <span>Fase 4: Integración y Pruebas</span>
+                        <span class="accordion-icon">+</span>
+                    </button>
+                    <div class="accordion-content hidden p-4 border-t">
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>Integración del hardware y el software.</li>
+                            <li>Pruebas iniciales y depuración de errores.</li>
+                            <li>Sintonización fina (empírica) de las constantes Kp, Ki y Kd.</li>
+                            <li>Pruebas de campo bajo condiciones reales de sol para validar el rendimiento.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-lg">
+                    <button class="accordion-header w-full text-left p-4 font-bold text-lg text-sky-800 flex justify-between items-center">
+                        <span>Fase 5: Documentación y Presentación</span>
+                        <span class="accordion-icon">+</span>
+                    </button>
+                    <div class="accordion-content hidden p-4 border-t">
+                        <ul class="list-disc list-inside space-y-1 text-slate-600">
+                            <li>Redacción del informe final del proyecto (fundamentos, diagramas, código, resultados y conclusiones).</li>
+                            <li>Preparación del material para la presentación final y demostración del prototipo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cronograma" class="scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Cronograma de Actividades (16 Semanas)</h2>
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg">
+                <div class="chart-container">
+                    <canvas id="ganttChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 text-center p-4 mt-16">
+        <p>Propuesta de Proyecto para el Curso de Sistemas de Control.</p>
+    </footer>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl font-bold text-sky-800"></h3>
+                <button id="modal-close" class="text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <p id="modal-content" class="text-slate-600"></p>
+        </div>
+    </div>
+    
+    <style>
+        .diagram-block {
+            border: 2px solid #0ea5e9; /* sky-500 */
+            background-color: #f0f9ff; /* sky-50 */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .diagram-block:hover {
+            background-color: #e0f2fe; /* sky-100 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .arrow { font-size: 1.5rem; color: #7dd3fc; /* sky-300 */ font-weight: bold; margin: 0 0.5rem; }
+        .arrow-vertical-down { font-size: 1.5rem; color: #7dd3fc; font-weight: bold; margin: 0.25rem 0; }
+        .arrow-dashed-up {
+            font-size: 1.5rem; color: #cbd5e1; /* slate-300 */
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            margin-right: -2rem;
+            align-self: flex-start;
+        }
+        .arrow-dashed-side { color: #cbd5e1; /* slate-300 */ letter-spacing: 2px; }
+        @media (max-width: 767px) {
+            .arrow { transform: rotate(90deg); margin: 0.5rem 0;}
+            .arrow-dashed-up { display: none; }
+            .arrow-dashed-side { transform: rotate(90deg); margin: 1rem 0; }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const blockDescriptions = {
+                'panel': { 
+                    title: 'Fuente de Energía (Paneles Solares)', 
+                    text: 'Captan la energía solar y la convierten en energía eléctrica de corriente continua (CC) variable, que es la entrada principal del sistema.' 
+                },
+                'sensores': { 
+                    title: 'Sensores (Tensión y Corriente)', 
+                    text: 'Miden en tiempo real el voltaje del panel, el voltaje de la batería y la corriente de carga. Estos datos son cruciales para el lazo de control.' 
+                },
+                'microcontrolador': { 
+                    title: 'Microcontrolador (Cerebro del Sistema)', 
+                    text: 'Ejecuta el algoritmo de control PID. Procesa las lecturas de los sensores, calcula la señal de control (salida PID) y la envía a la etapa de potencia. También gestiona la comunicación inalámbrica.' 
+                },
+                'potencia': { 
+                    title: 'Etapa de Potencia (Convertidor DC/DC)', 
+                    text: 'Actúa como el elemento final de control. Generalmente un convertidor tipo Buck, ajusta su ciclo de trabajo (PWM) según la señal del controlador PID para regular la energía que fluye hacia la batería.' 
+                },
+                'bateria': { 
+                    title: 'Batería', 
+                    text: 'Almacena la energía eléctrica para su uso posterior. El controlador asegura que se cargue de manera segura y eficiente para maximizar su vida útil.' 
+                },
+                'comunicacion': { 
+                    title: 'Módulo de Comunicación', 
+                    text: 'Un módulo (como Bluetooth o WiFi) que transmite los datos del sistema de forma inalámbrica desde el microcontrolador hacia el dispositivo móvil del usuario.' 
+                },
+                'app': { 
+                    title: 'Aplicación Móvil', 
+                    text: 'Recibe, procesa y muestra los datos al usuario en una interfaz gráfica amigable, permitiendo el monitoreo remoto del estado y rendimiento del sistema.' 
+                }
+            };
+
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalClose = document.getElementById('modal-close');
+
+            document.querySelectorAll('.diagram-block').forEach(block => {
+                block.addEventListener('click', () => {
+                    const blockId = block.dataset.id;
+                    const data = blockDescriptions[blockId];
+                    if (data) {
+                        modalTitle.textContent = data.title;
+                        modalContent.textContent = data.text;
+                        modal.classList.remove('hidden');
+                    }
+                });
+            });
+
+            modalClose.addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.accordion-icon');
+                    content.classList.toggle('hidden');
+                    icon.textContent = content.classList.contains('hidden') ? '+' : '-';
+                });
+            });
+
+            const ctx = document.getElementById('ganttChart').getContext('2d');
+            const ganttChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Fase 5: Documentación',
+                        'Fase 4: Pruebas',
+                        'Fase 3: Desarrollo',
+                        'Fase 2: Diseño',
+                        'Fase 1: Investigación',
+                    ],
+                    datasets: [{
+                        label: 'Semanas',
+                        data: [
+                            [15, 16],
+                            [13, 16],
+                            [9, 14],
+                            [5, 8],
+                            [1, 4]
+                        ],
+                        backgroundColor: 'rgba(14, 165, 233, 0.6)',
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.7,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 16,
+                            title: {
+                                display: true,
+                                text: 'Semanas del Proyecto'
+                            },
+                            grid: {
+                                display: true
+                            }
+                        },
+                        y: {
+                           grid: {
+                                display: false
+                           }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const v = context.raw;
+                                    return `Semanas ${v[0]} a ${v[1]}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
